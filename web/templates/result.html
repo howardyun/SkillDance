@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% block title %}Scan Result{% endblock %}
+{% block content %}
+{% if error_type %}
+<section class="panel">
+  <h2>Scan Result</h2>
+  <div class="meta-stack">
+    <p class="mono">Repository URL: {{ repo_url }}</p>
+    {% if skill_name %}
+    <p class="mono">Skill name: {{ skill_name }}</p>
+    {% endif %}
+  </div>
+  <div class="error-box">
+    <h3>{{ error_type }}</h3>
+    <p>{{ error_message }}</p>
+  </div>
+  <a class="back-link" href="/">Start another scan</a>
+</section>
+{% else %}
+<section class="report-hero">
+  <p class="eyebrow">Scan Result</p>
+  <div class="report-hero-grid">
+    <div class="report-copy">
+      <h2 class="report-title">{{ summary.skill_id }}</h2>
+      <div class="meta">
+        <span class="meta-chip">Repository: {{ repo_url }}</span>
+        <span class="meta-chip">Skill Name: {{ skill_name }}</span>
+      </div>
+    </div>
+    <div class="stats">
+      <article class="stat">
+        <div class="stat-label">Skill Status</div>
+        <div class="stat-value">{{ summary.skill_level_label }}</div>
+      </article>
+      <article class="stat">
+        <div class="stat-label">Category Count</div>
+        <div class="stat-value">{{ summary.category_count }}</div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="results">
+  <article
+    class="skill-card"
+    data-filterable-card
+    data-default-filter="{% if summary.category_filter_counts.risk %}risk{% elif summary.category_filter_counts.warning %}warning{% else %}safe{% endif %}"
+  >
+    <header class="skill-top">
+      <div>
+        <h3 class="skill-id">{{ summary.skill_id }}</h3>
+      </div>
+      <span class="badge tone-{{ summary.skill_level_tone }}">{{ summary.skill_level_label }}</span>
+    </header>
+
+    <div class="filter-tabs" role="tablist" aria-label="分类风险筛选">
+      <button
+        class="filter-tab tone-danger"
+        type="button"
+        role="tab"
+        data-filter-target="risk"
+        aria-selected="false"
+      >
+        <span class="filter-tab-label">Risk</span>
+        <span class="filter-tab-count">{{ summary.category_filter_counts.risk }}</span>
+      </button>
+      <button
+        class="filter-tab tone-warn"
+        type="button"
+        role="tab"
+        data-filter-target="warning"
+        aria-selected="false"
+      >
+        <span class="filter-tab-label">Warning</span>
+        <span class="filter-tab-count">{{ summary.category_filter_counts.warning }}</span>
+      </button>
+      <button
+        class="filter-tab tone-ok"
+        type="button"
+        role="tab"
+        data-filter-target="safe"
+        aria-selected="false"
+      >
+        <span class="filter-tab-label">Safe</span>
+        <span class="filter-tab-count">{{ summary.category_filter_counts.safe }}</span>
+      </button>
+    </div>
+
+    <div class="filter-note">
+      <span class="mono" data-filter-summary>点击上方状态卡切换下方分类内容</span>
+    </div>
+
+    <div class="skill-summary">
+      {% for key, value in summary.category_status_counts.items() %}
+      <span class="mini-stat"><span class="mono">{{ key }}</span>: {{ value }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="categories">
+      {% for category in summary.category_discrepancies %}
+      <details class="category" data-filter-group="{{ category.filter_bucket }}">
+        <summary>
+          <div class="category-head">
+            <div class="category-title">
+              <span class="category-name">{{ category.category_name }}</span>
+              <span class="category-id">{{ category.category_id }}</span>
+            </div>
+            <span class="badge tone-{{ category.status_tone }}">{{ category.status_label }}</span>
+          </div>
+          <div class="presence">
+            <span>声明层: {{ "是" if category.declaration_present else "否" }}</span>
+            <span>实现层: {{ "是" if category.implementation_present else "否" }}</span>
+          </div>
+        </summary>
+        <div class="category-body">
+          <div class="list-block">
+            {% if category.risks %}
+            <div>
+              <p class="category-label">风险映射</p>
+              <div class="pill-row">
+                {% for risk in category.risks %}
+                <span class="pill">{{ risk }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+            {% if category.controls %}
+            <div>
+              <p class="category-label">建议控制项</p>
+              <div class="pill-row">
+                {% for control in category.controls %}
+                <span class="pill">{{ control }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="side-by-side">
+            <section class="pane">
+              <div class="pane-title">
+                <strong>声明层</strong>
+                <span class="badge tone-{{ 'ok' if category.declaration_present else 'muted' }}">
+                  {{ "已命中" if category.declaration_present else "未命中" }}
+                </span>
+              </div>
+
+              {% if category.declaration_atomic_ids or category.declaration_control_ids %}
+              <div class="token-group">
+                {% if category.declaration_atomic_ids %}
+                <p class="token-label">原子能力</p>
+                <div class="token-row">
+                  {% for item in category.declaration_atomic_ids %}
+                  <span class="token"><code>{{ item }}</code></span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if category.declaration_control_ids %}
+                <p class="token-label">控制项</p>
+                <div class="token-row">
+                  {% for item in category.declaration_control_ids %}
+                  <span class="token"><code>{{ item }}</code></span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              {% endif %}
+
+              {% if category.declaration_details %}
+              <div class="detail-list">
+                {% for detail in category.declaration_details %}
+                <article class="detail">
+                  <div class="detail-head">
+                    <span class="kind">{{ detail.kind }}</span>
+                    <strong>{{ detail.name }}</strong>
+                    {% if detail.id %}
+                    <span class="pill"><code>{{ detail.id }}</code></span>
+                    {% endif %}
+                    {% if detail.confidence %}
+                    <span class="pill">{{ detail.confidence }}</span>
+                    {% endif %}
+                  </div>
+                  {% if detail.evidence %}
+                  <div class="evidence">
+                    {% for item in detail.evidence %}
+                    <div class="evidence-item">
+                      <div class="evidence-meta">{{ item.source_path }} {{ item.lines }}</div>
+                      <div class="evidence-text">{{ item.matched_text }}</div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </article>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p class="empty">当前分类没有可展示的声明层细节。</p>
+              {% endif %}
+            </section>
+
+            <section class="pane">
+              <div class="pane-title">
+                <strong>实现层</strong>
+                <span class="badge tone-{{ 'ok' if category.implementation_present else 'muted' }}">
+                  {{ "已命中" if category.implementation_present else "未命中" }}
+                </span>
+              </div>
+
+              {% if category.implementation_atomic_ids or category.implementation_control_ids %}
+              <div class="token-group">
+                {% if category.implementation_atomic_ids %}
+                <p class="token-label">原子能力</p>
+                <div class="token-row">
+                  {% for item in category.implementation_atomic_ids %}
+                  <span class="token"><code>{{ item }}</code></span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+                {% if category.implementation_control_ids %}
+                <p class="token-label">控制项</p>
+                <div class="token-row">
+                  {% for item in category.implementation_control_ids %}
+                  <span class="token"><code>{{ item }}</code></span>
+                  {% endfor %}
+                </div>
+                {% endif %}
+              </div>
+              {% endif %}
+
+              {% if category.implementation_details %}
+              <div class="detail-list">
+                {% for detail in category.implementation_details %}
+                <article class="detail">
+                  <div class="detail-head">
+                    <span class="kind">{{ detail.kind }}</span>
+                    <strong>{{ detail.name }}</strong>
+                    {% if detail.id %}
+                    <span class="pill"><code>{{ detail.id }}</code></span>
+                    {% endif %}
+                    {% if detail.confidence %}
+                    <span class="pill">{{ detail.confidence }}</span>
+                    {% endif %}
+                  </div>
+                  {% if detail.evidence %}
+                  <div class="evidence">
+                    {% for item in detail.evidence %}
+                    <div class="evidence-item">
+                      <div class="evidence-meta">{{ item.source_path }} {{ item.lines }}</div>
+                      <div class="evidence-text">{{ item.matched_text }}</div>
+                    </div>
+                    {% endfor %}
+                  </div>
+                  {% endif %}
+                </article>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p class="empty">当前分类没有可展示的实现层细节。</p>
+              {% endif %}
+            </section>
+          </div>
+        </div>
+      </details>
+      {% endfor %}
+      <div class="empty-filter-state" data-filter-empty hidden>
+        当前筛选下暂无分类项。
+      </div>
+    </div>
+
+    {% if summary.errors %}
+    <article class="error-box category-errors">
+      <h3>Case Errors</h3>
+      <ul>
+        {% for err in summary.errors %}
+        <li>{{ err }}</li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endif %}
+  </article>
+
+  {% if scan_meta and config.DEBUG %}
+  <section class="panel">
+    <h3>Debug Details</h3>
+    <p class="mono">Run ID: {{ scan_meta.run_id }}</p>
+    <p class="mono">Run dir: {{ scan_meta.run_dir }}</p>
+    <p class="mono">Case JSON: {{ scan_meta.case_json_path }}</p>
+    <p class="mono">Command: {{ scan_meta.command }}</p>
+  </section>
+  {% endif %}
+</section>
+
+<a class="back-link" href="/">Start another scan</a>
+{% endif %}
+{% if not error_type %}
+<script>
+  (() => {
+    const toneLabels = {
+      risk: "Risk",
+      warning: "Warning",
+      safe: "Safe",
+    };
+
+    document.querySelectorAll("[data-filterable-card]").forEach((card) => {
+      const buttons = Array.from(card.querySelectorAll("[data-filter-target]"));
+      const items = Array.from(card.querySelectorAll("[data-filter-group]"));
+      const summary = card.querySelector("[data-filter-summary]");
+      const emptyState = card.querySelector("[data-filter-empty]");
+      const available = buttons.find((button) => Number(button.querySelector(".filter-tab-count")?.textContent || 0) > 0);
+      const defaultFilter = card.dataset.defaultFilter || available?.dataset.filterTarget || "risk";
+
+      const update = (nextFilter) => {
+        let visibleCount = 0;
+
+        buttons.forEach((button) => {
+          const active = button.dataset.filterTarget === nextFilter;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-selected", active ? "true" : "false");
+          button.setAttribute("tabindex", active ? "0" : "-1");
+        });
+
+        items.forEach((item) => {
+          const active = item.dataset.filterGroup === nextFilter;
+          item.hidden = !active;
+          if (active) {
+            visibleCount += 1;
+          }
+        });
+
+        if (summary) {
+          summary.textContent = "\u5f53\u524d\u663e\u793a " + toneLabels[nextFilter] + " \u5206\u7c7b\uff0c\u5171 " + visibleCount + " \u9879";
+        }
+
+        if (emptyState) {
+          emptyState.hidden = visibleCount > 0;
+        }
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => update(button.dataset.filterTarget));
+      });
+
+      update(defaultFilter);
+    });
+  })();
+</script>
+{% endif %}
+{% endblock %}

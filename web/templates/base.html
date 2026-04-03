@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Skill Repo Scan{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-brand">
+          <img class="hero-logo" src="{{ url_for('static', filename='logo/logo.png') }}" alt="OpenClaw logo" />
+          <div class="hero-copy">
+            <div class="hero-topline">
+              <p class="eyebrow">OPENCLAW SECURITY MATRIX</p>
+            </div>
+            <h1>GitHub Skill Security Scanner</h1>
+          </div>
+        </div>
+        <p class="subtle">面向 Skill 仓库的自动化安全检测系统。通过比对名称、描述、内置文件与权限能力，发现“声明与实现不一致”的可疑 Skill，并对 4 大类 58 小类权限进行风险归因。</p>
+        <div class="hero-meta">
+          <span class="meta-item">Pipeline: Clone → Discover → Inspect → Verify</span>
+          <span class="meta-item">Focus: Consistency · Permission Risk · File Intent</span>
+        </div>
+      </header>
+      <main class="content">{% block content %}{% endblock %}</main>
+    </div>
+  </body>
+</html>

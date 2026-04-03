@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Choose Skill{% endblock %}
+{% block content %}
+<section class="panel">
+  <h2>Choose a Skill</h2>
+  <p class="subtle">{{ message }}</p>
+  <div class="meta-stack">
+    <p class="mono">Repository: {{ repo_url }}</p>
+  {% if skill_name %}
+    <p class="mono">Submitted skill name: {{ skill_name }}</p>
+  {% endif %}
+  </div>
+
+  <form method="post" action="/scan/select-skill" class="candidate-list">
+    <input type="hidden" name="repo_url" value="{{ repo_url }}" />
+    <input type="hidden" name="skill_name" value="{{ skill_name }}" />
+
+    {% for candidate in candidates %}
+    <label class="candidate-item">
+      <input type="radio" name="relative_path" value="{{ candidate.relative_path }}" {% if loop.first %}checked{% endif %} />
+      <span>{{ candidate.name }}</span>
+      <small>{{ candidate.relative_path }}</small>
+    </label>
+    {% endfor %}
+
+    <button type="submit">Run Scan for Selected Skill</button>
+  </form>
+</section>
+{% endblock %}

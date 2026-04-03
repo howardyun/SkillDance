@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Start Scan{% endblock %}
+{% block content %}
+<section class="panel panel-main">
+  <div class="search-hub">
+    <div class="search-header">
+      <h2>Which skill repo would you like to verify?</h2>
+      <p class="subtle">输入仓库地址和 skill 名称，立即扫描</p>
+    </div>
+    <form method="post" action="/scan" class="hero-search-form">
+      <div class="search-stack">
+        <label for="repo_url">Repository</label>
+        <input id="repo_url" name="repo_url" type="text" value="{{ form_data.repo_url }}" placeholder="https://github.com/owner/repo" required />
+      </div>
+      <div class="search-stack">
+        <label for="skill_name">Skill</label>
+        <input id="skill_name" name="skill_name" type="text" value="{{ form_data.skill_name }}" placeholder="find-skills" />
+      </div>
+      <div class="cta-row">
+        <button type="submit">Scan Repository</button>
+      </div>
+    </form>
+  </div>
+
+  {% if error_title %}
+  <div class="error-box">
+    <h3>{{ error_title }}</h3>
+    <p>{{ error_message }}</p>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel recent-panel">
+  <div class="section-title">
+    <h2>Recently Checked</h2>
+    <p class="subtle">最近一次检测会显示在最上方。</p>
+  </div>
+  {% if recent_scans %}
+  <div class="recent-list">
+    {% for item in recent_scans %}
+    <a class="recent-item-link" href="{{ item.history_path }}">
+    <article class="recent-item">
+      <div class="recent-item-top">
+        <div class="recent-main">
+          <h3>{{ item.skill_id }}</h3>
+          <p class="mono">{{ item.repo_key }} / {{ item.skill_key }}</p>
+        </div>
+        <span class="badge tone-{{ item.status_tone }}">{{ item.status_label }}</span>
+      </div>
+      <div class="recent-meta">
+        <span class="meta-chip">Categories: {{ item.category_count }}</span>
+        <span class="meta-chip">Checked: {{ item.updated_at }}</span>
+      </div>
+    </article>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="hint-card">
+    <h3>No Scan Yet</h3>
+    <p class="subtle">先执行一次扫描，这里会自动展示历史记录。</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
