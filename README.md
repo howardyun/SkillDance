@@ -1,5 +1,5 @@
-# OpenClaw Project
-![示意图](./icon.png)
+# SkillDance
+![示意图](./icon.jpg)\
 OpenClaw 是一个围绕技能生态数据采集与安全分析的 Python 项目，当前主要覆盖两个来源：`skills.sh` 与 `SkillsDirectory`。仓库内脚本负责抓取技能清单、补充 GitHub 元数据、批量下载对应仓库，并将安全审计结果落库到 SQLite，方便后续研究、统计与复查。
 
 > [!NOTE]
