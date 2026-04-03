@@ -1,6 +1,6 @@
 # SkillDance
 ![示意图](./icon.jpg)\
-OpenClaw 是一个围绕技能生态数据采集与安全分析的 Python 项目，当前主要覆盖两个来源：`skills.sh` 与 `SkillsDirectory`。仓库内脚本负责抓取技能清单、补充 GitHub 元数据、批量下载对应仓库，并将安全审计结果落库到 SQLite，方便后续研究、统计与复查。
+SkillDance 是一个围绕技能生态数据采集与安全分析的 Python 项目，当前主要覆盖两个来源：`skills.sh` 与 `SkillsDirectory`。仓库内脚本负责抓取技能清单、补充 GitHub 元数据、批量下载对应仓库，并将安全审计结果落库到 SQLite，方便后续研究、统计与复查。
 
 > [!NOTE]
 > 当前项目仍以脚本驱动为主，根目录的 `main.py` 只是一个占位入口；实际功能集中在 `crawling/` 目录。
@@ -269,7 +269,7 @@ python main.py \
 
 核心行为：
 
-- 解析 [`analyzer/security matrix.md`](/home/szk/code/OpenClaw-Proj/analyzer/security%20matrix.md) 中的多段矩阵：`Category Matrix`、`Atomic Capabilities`、`Control Semantics`、`Capability Mappings`、`Mismatch Definitions`
+- 解析 [`analyzer/security matrix.md`](/home/szk/code/SkillDance/analyzer/security%20matrix.md) 中的多段矩阵：`Category Matrix`、`Atomic Capabilities`、`Control Semantics`、`Capability Mappings`、`Mismatch Definitions`
 - 发现本地 skill 目录并生成结构画像
 - 仅从 `SKILL.md` 及其显式引用材料提取声明层证据
 - 从代码、脚本、配置中提取实现层证据，并区分原子能力证据与控制语义证据
@@ -345,7 +345,7 @@ gold set 验证说明：
 - 如需校验最终状态，也可以额外提供 `decision_status`
 - 运行后会在终端摘要和 `validation.json` 中给出命中率、缺失项和状态不匹配统计
 
-更详细的输入、输出和证据语义说明见 [`docs/analyzer/skills-security-matrix-analyzer.md`](/home/szk/code/OpenClaw-Proj/docs/analyzer/skills-security-matrix-analyzer.md)。
+更详细的输入、输出和证据语义说明见 [`docs/analyzer/skills-security-matrix-analyzer.md`](/home/szk/code/SkillDance/docs/analyzer/skills-security-matrix-analyzer.md)。
 
 ## Notes
 
